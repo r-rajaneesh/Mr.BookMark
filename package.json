@@ -1,0 +1,24 @@
+{
+  "name": "mr.bookmark",
+  "version": "1.0.0",
+  "description": "Bookmarks your message",
+  "main": "bot.js",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^8.2.0",
+    "fs": "0.0.1-security",
+    "nodemon": "^2.0.7",
+    "pretty-ms": "^7.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node bot.js",
+    "startn": "nodemon bot.js"
+  },
+  "keywords": [
+    "Bookmark",
+    "DM"
+  ],
+  "author": "nigelrex <nigelrex2021@gmail.com>",
+  "license": "MIT"
+}
