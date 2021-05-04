@@ -8,6 +8,7 @@ const fs = require("fs");
 const dotenv = require("dotenv").config();
 const { prefix, color, warn, error } = require("./config.json");
 const prettyMilliseconds = require("pretty-ms");
+const keepAlive = require("./server");
 
 // On Ready
 client.once("ready", () => {
