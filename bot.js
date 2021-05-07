@@ -12,11 +12,9 @@ const keepAlive = require("./server");
 
 // On Ready
 client.once("ready", () => {
-  const activity = "Your Bookmarks";
-  client.user.setActivity(`${activity}`, { type: "WATCHING" });
-  client.user.setStatus("dnd");
+  client.user.setActivity("Your Bookmarks", { type: "WATCHING" });
   console.log(
-    `Ready to Bookmark messages!\n\n\nActivity set as ${activity}\n\n\n`
+    `Ready to Bookmark messages!\n\n\n`
   );
 });
 
@@ -36,11 +34,16 @@ client.on("message", (message) => {
             value: "!",
           },
           {
+            name: "Ping",
+            value: "to check the bot's ping type `!ping` and the bot will respond with the time taken to respond!",
+          },
+          {
             name: "How to use?",
             value:
               "To Book Mark a message simply react to 🔖 on\n a message and the bot will send the message in your DM's",
           },
         ],
+        image: { url: 'https://cdn.discordapp.com/attachments/837890513990451280/840189220253597696/Animation.gif'},
         footer: { text: "- By Mr.BookMark" },
       },
     });
@@ -143,4 +146,6 @@ client.on("message", (message) => {
         .catch((error) => console.error(error));
   }
 });
+
+keepAlive();
 client.login(process.env.bottoken);

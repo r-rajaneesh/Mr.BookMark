@@ -13,8 +13,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node bot.js",
-    "startn": "nodemon bot.js"
+    "startn": "node bot.js",
+    "start": "nodemon bot.js"
   },
   "keywords": [
     "Bookmark",
