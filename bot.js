@@ -31,7 +31,7 @@ client.on("message", (message) => {
         fields: [
           {
             name: "Prefix",
-            value: "!",
+            value: `${prefix}`,
           },
           {
             name: "Ping",
@@ -43,7 +43,7 @@ client.on("message", (message) => {
               "To Book Mark a message simply react to 🔖 on\n a message and the bot will send the message in your DM's",
           },
         ],
-        image: { url: 'https://cdn.discordapp.com/attachments/837890513990451280/840189220253597696/Animation.gif'},
+        image: { url: 'https://cdn.discordapp.com/attachments/837890513990451280/840821620745437205/Animation.gif'},
         footer: { text: "- By Mr.BookMark" },
       },
     });
