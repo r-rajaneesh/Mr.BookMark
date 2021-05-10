@@ -35,7 +35,7 @@ client.on("message", (message) => {
           },
           {
             name: "Ping",
-            value: "to check the bot's ping type `!ping` and the bot will respond with the time taken to respond!",
+            value: `to check the bot's ping type ${prefix}ping and the bot will respond with the time taken to respond!`,
           },
           {
             name: "How to use?",
