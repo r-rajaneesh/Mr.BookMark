@@ -51,6 +51,41 @@ client.on("message", (message) => {
 });
 
 client.on("message", (message) => {
+  if (message.mentions.users.has(client.user.id) && !message.author.bot) {
+    message.reply({
+      embed: {
+        author: {
+          name: "Mr.BookMark",
+          icon_url:
+            "https://cdn.discordapp.com/attachments/837890513990451280/838652379628044348/pack_icon.png",
+        },
+        color: color,
+        fields: [
+          {
+            name: "Prefix",
+            value: `${prefix}`,
+          },
+          {
+            name: "Ping",
+            value: `to check the bot's ping type ${prefix}ping and the bot will respond with the time taken to respond!`,
+          },
+          {
+            name: "How to use?",
+            value:
+              "To Book Mark a message simply react to 🔖 on\n a message and the bot will send the message in your DM's",
+          },
+        ],
+        image: {
+          url:
+            "https://cdn.discordapp.com/attachments/837890513990451280/840821620745437205/Animation.gif",
+        },
+        footer: { text: "- By Mr.BookMark" },
+      },
+    });
+  }
+});
+
+client.on("message", (message) => {
   if (message.content === `${prefix}ping`) {
     message.reply({
       embed: {
