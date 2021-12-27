@@ -1,5 +1,5 @@
 {
-    "prefix":"!b",
+    "prefix":"b!",
     "color": 1004000,
     "warn": "YELLOW",
     "error": "RED"
