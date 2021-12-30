@@ -1,4 +1,7 @@
 const Discord = require("discord.js");
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
+const djsb = require("@discordjs/builders");
 const client = new Discord.Client({
 	shards: "auto",
 	//shardCount: "auto",
@@ -35,186 +38,97 @@ const client = new Discord.Client({
 });
 const fs = require("fs-extra");
 require("dotenv").config();
-const { prefix, color, warn, error } = require("./config.json");
+const config = require("./config.json");
 const prettyMilliseconds = require("pretty-ms");
 const keepAlive = require("./server");
+const rest = new REST({ version: "9" }).setToken(process.env.bottoken);
 
 // On Ready
-client.once("ready", () => {
-	console.log(`Ready to Bookmark messages!\n\n\n`);
-});
-client.on("messageCreate", async (message) => {
-	if (message.content === `${prefix}help`) {
-		message.reply({
-			embeds: [
-				{
-					author: {
-						name: "Mr.BookMark",
-						icon_url: "https://cdn.discordapp.com/attachments/837890513990451280/838652379628044348/pack_icon.png",
-					},
-					color: color,
-					fields: [
-						{
-							name: "Prefix",
-							value: `${prefix}`,
-						},
-						{
-							name: "Ping",
-							value: `to check the bot's ping type ${prefix}ping and the bot will respond with the time taken to respond!`,
-						},
-						{
-							name: "How to use?",
-							value:
-								"To Book Mark a message simply react to 🔖 on\n a message and the bot will send the message in your DM's",
-						},
-					],
-					image: { url: "https://cdn.discordapp.com/attachments/837890513990451280/840821620745437205/Animation.gif" },
-					footer: { text: "- By Mr.BookMark" },
-				},
-			],
-		});
-	}
-	if (message.mentions.users.first() === client.user && !message.author.bot) {
-		message.reply({
-			embeds: [
-				{
-					author: {
-						name: "Mr.BookMark",
-						icon_url: "https://cdn.discordapp.com/attachments/837890513990451280/838652379628044348/pack_icon.png",
-					},
-					color: color,
-					fields: [
-						{
-							name: "Prefix",
-							value: `${prefix}`,
-						},
-						{
-							name: "Ping",
-							value: `to check the bot's ping type ${prefix}ping and the bot will respond with the time taken to respond!`,
-						},
-						{
-							name: "How to use?",
-							value:
-								"To Book Mark a message simply react to 🔖 on\n a message and the bot will send the message in your DM's",
-						},
-					],
-					image: {
-						url: "https://cdn.discordapp.com/attachments/837890513990451280/840821620745437205/Animation.gif",
-					},
-					footer: { text: "- By Mr.BookMark" },
-				},
-			],
-		});
-	}
-	if (message.content === `${prefix}ping`) {
-		message.reply({
-			embeds: [
-				{
-					author: {
-						name: "Pong!",
-						icon_url: "https://cdn.discordapp.com/attachments/807219422737334322/838648055758192660/ping.gif",
-					},
-					color: color,
-					fields: [
-						{
-							name: "Latency",
-							value: `${Date.now() - message.createdTimestamp}ms`,
-						},
-						{
-							name: "Uptime",
-							value: prettyMilliseconds(client.uptime, {
-								secondsDecimalDigits: 0,
-							}),
-						},
-					],
-					footer: {
-						text: String(new Date().toUTCString()),
-					},
-				},
-			],
-		});
-	}
 
-	if (message.content === `${prefix}die`) {
-		if (message.author.id === "738032578820309072") {
-			message
-				.react("👍")
-				.then(() =>
-					message.channel.send({
-						embeds: [
-							{
-								title: "Shutting the bot down",
-								description: `The bot has been shut down by ${message.author.tag}`,
-								color: color, //your color in the blank
-							},
-						],
-					}),
-				)
-				.then(() => process.exit());
-			var user = `${message.author.tag}`;
-			console.log(`Bot has been stopped by ${user}`);
-			console.log("Mr.BookMark is Dead!");
-		} else
-			message
-				.delete()
-				.then(() =>
-					message.channel
-						.send({
-							embeds: [
-								{
-									title: "This can only be done by the owner of the bot!",
-								},
-							],
-						})
-						.then((message) => message.delete({ timeout: 10000 })),
-				)
-				.catch((error) => console.error(error));
-	}
-});
+const intrct = new djsb.ContextMenuCommandBuilder().setName("Bookmark Message").setType(3);
+client.once("ready", async () => {
+	const guildSize = await client.guilds.fetch().then(async (g) => JSON.stringify(g.size));
+	// await client.users.fetch();
+	const memberSize = client.users.cache.size;
+	console.log(`Ready to Bookmark messages!\n\n\nGuilds: ${guildSize}\nMembers: ${memberSize}\n\n\n`);
+	(async () => {
+		try {
+			console.log("Started refreshing application (/) commands.");
 
-client.on("messageReactionAdd", async (reaction, user) => {
-	if (reaction.partial) {
-		await reaction.message.channel.messages.fetch({ limit: 100 });
-	}
-	if (reaction.emoji.name === "🔖") {
-		user
-			.send({
+			await rest.put(Routes.applicationCommands("837617682345623572"), {
+				body: [intrct.toJSON()],
+			});
+
+			console.log("Successfully reloaded application (/) commands.");
+		} catch (error) {
+			console.error(error);
+		}
+	})();
+});
+client.on("interactionCreate", async (interaction) => {
+	if (interaction.isContextMenu()) {
+		await interaction.deferReply({ ephemeral: true });
+		const message = await interaction.channel.messages.fetch(interaction.targetId);
+		if (message.author.bot && !message.content) {
+			return await interaction.editReply({
 				embeds: [
 					{
-						color: color,
-						author: {
-							name: `${reaction?.message?.author?.username}`,
-							icon_url: `${reaction.message.author.displayAvatarURL()}`,
-						},
-						description: `${reaction.message.content}`,
-						fields: [{ name: "Original", value: `[Jump](${reaction.message.url})` }],
-						footer: {
-							text: `From ${reaction.message.guild.name} #${reaction.message.channel.name}`,
-						},
+						author: { name: "Unable to bookmark this message" },
+						description: "This message is an embed, this cannot be bookmarked",
+						color: "RED",
 					},
 				],
-			})
-			.then(() =>
-				reaction.message.reactions.cache
-					.get("🔖")
-					.remove()
-					.catch((error) => console.error("Failed to remove reactions: ", error)),
-			);
-	}
-	try {
-		if (
-			reaction.emoji.name === "❌" &&
-			reaction.message.channel.type === "DM" &&
-			reaction.message?.author?.id === client.user.id
-		) {
-			await reaction.message.delete();
+				ephemeral: true,
+			});
 		}
-	} catch (e) {
-		reaction.message.channel.send({
-			embeds: [{ author: { name: "Unable to delete message" }, description: "message is too old to be deleted" }],
-		});
+		const embed = new Discord.MessageEmbed()
+			.setAuthor({
+				name: `${message?.author?.tag}`,
+				iconURL: `${message.author?.displayAvatarURL()}`,
+			})
+			.setDescription(`${message.content}`)
+			.addFields({ name: "Original Message", value: `[Jump to message](${message.url})`, inline: true })
+			.setFooter(`From ${interaction.guild.name} in #${interaction.channel.name}`)
+			.setColor("BLURPLE");
+		if (message.attachments.first()) {
+			if (message.attachments.first().contentType === ("image/png" || "image/gif" || "image/jpeg" || "image/jpng")) {
+				embed.setImage(message.attachments.first()?.url);
+			} else {
+				embed.addFields({
+					name: "Attachment included that cannot be bookmarked",
+					value: `[Attachment](${message.attachments.first()?.url})`,
+					inline: true,
+				});
+			}
+		}
+		await interaction.user
+			.send({
+				embeds: [embed],
+			})
+			.then(async (msg) => {
+				return await interaction.editReply({
+					embeds: [
+						{
+							author: { name: "Bookmarked!" },
+							description: `Check your DM's`,
+							fields: [
+								{ name: "Bookmarked message", value: `[Jump to Message](${msg?.url})`, inline: true },
+								{ name: "Original Message", value: `[Jump to message](${message.url})`, inline: true },
+							],
+							color: "BLURPLE",
+						},
+					],
+					ephemeral: true,
+				});
+			})
+			.catch(async (error) => {
+				return await interaction.editReply({
+					embeds: [
+						{ author: { name: "Unable to Bookmark this message" }, description: `Is your DM's enabled?`, color: "RED" },
+					],
+				});
+			});
 	}
 });
-
 keepAlive();
 client.login(process.env.bottoken);

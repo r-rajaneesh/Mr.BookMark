@@ -1,8 +1,7 @@
 {
-    "prefix":"b!",
-    "color": 1004000,
-    "warn": "YELLOW",
-    "error": "RED"
+	"prefix": "b!",
+	"color": 1004000,
+	"warn": "YELLOW",
+	"error": "RED",
+	"botId": "837617682345623572"
 }
-        
-
