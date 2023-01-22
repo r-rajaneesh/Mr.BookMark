@@ -7,11 +7,11 @@
   "scripts": {
     "devstart": "ts-node --esm index.ts",
     "build": "tsc index.ts -t esnext -m nodenext -d --outDir ./dist",
-    "start": "npm run build && node ."
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3",
   "dependencies": {
     "cron": "^2.2.0",
     "discord.js": "^14.7.1",

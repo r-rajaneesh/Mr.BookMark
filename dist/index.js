@@ -38,7 +38,7 @@ client.on("ready", (client) => {
     console.log(`${"-".repeat(42)}\n`);
     console.log(`❯❯❯ ${pc.green("Commands are now available for usage!")}\n`);
     console.log(`❯❯❯ ${pc.green(`Serving ${pc.reset(client.guilds.cache.size)} ${pc.green(`servers`)}`)}\n`);
-    console.log(`❯❯❯ ${pc.green(`Serving ${pc.reset(`${client.users.cache.size}`)} ${pc.green(`members`)}`)}\n`);
+    console.log(`❯❯❯ ${pc.green(`Serving ${pc.reset(`${client.users}`)} ${pc.green(`members`)}`)}\n`);
     console.log(`❯❯❯ ${pc.green(`${pc.reset(client?.user?.tag)} ${pc.green(`is up and running`)}\n`)}`);
     console.log(`❯❯❯ ${pc.green("Boot Time:")} ${ms(Math.round(process.uptime() * 1000))}\n`);
 });
@@ -46,8 +46,7 @@ const bookmarkCmd = new Discord.ContextMenuCommandBuilder().setName("Bookmark").
 const rest = new REST().setToken(`${process?.env?.BOT_TOKEN}`);
 rest.put(Routes.applicationCommands("837617682345623572"), { body: [bookmarkCmd.toJSON()] });
 client.on("interactionCreate", async (interaction) => {
-    if (!interaction.isCommand())
-        return;
+    // if (!interaction.isCommand()) return;
     if (interaction.isContextMenuCommand() && interaction.commandName === "Bookmark") {
         if (interaction?.channel?.type !== Discord.ChannelType.GuildText)
             return;
@@ -62,7 +61,11 @@ client.on("interactionCreate", async (interaction) => {
             .setColor("Blurple");
         const infoEmbed = new Discord.EmbedBuilder()
             .setTitle("Information")
-            .addFields({ name: "Original Message", value: `[Jump to message](${message?.url})`, inline: true }, { name: "Embeds", value: `[${embeds.length}]`, inline: true }, { name: "From", value: `From ${interaction?.guild?.name} in <#${message?.channel?.id}>`, inline: true })
+            .addFields({ name: "Original Message", value: `[Jump to message](${message?.url})`, inline: true }, { name: "Embeds", value: `[${embeds.length}]`, inline: true }, {
+            name: "From",
+            value: `[${interaction?.guild?.name}](https://discord.com/channels/${interaction.guildId}) in <#${message?.channel?.id}>`,
+            inline: true,
+        })
             .setColor("NotQuiteBlack")
             .setTimestamp();
         if (attachments?.first()) {
@@ -77,9 +80,11 @@ client.on("interactionCreate", async (interaction) => {
                 });
             }
         }
+        const button = new Discord.ActionRowBuilder().addComponents(new Discord.ButtonBuilder().setCustomId("delete").setLabel("Delete Bookmark").setEmoji({ name: "🗑️" }).setStyle(Discord.ButtonStyle.Danger));
         interaction.user
             .send({
             embeds: [embed, infoEmbed],
+            components: [button],
         })
             .then(async (msg) => {
             return await interaction.editReply({
@@ -94,6 +99,7 @@ client.on("interactionCreate", async (interaction) => {
             });
         })
             .catch(async (error) => {
+            console.log(error);
             return await interaction.editReply({
                 embeds: [
                     new Discord.EmbedBuilder()
@@ -105,5 +111,21 @@ client.on("interactionCreate", async (interaction) => {
             });
         });
     }
+    else if (interaction.isButton()) {
+        if (interaction.customId === "delete") {
+            await interaction.message.delete();
+        }
+    }
+});
+client.on("messageReactionAdd", async (reaction, user) => {
+    if (reaction.partial)
+        reaction = await reaction.fetch().catch((e) => e);
+    if (reaction.message.partial)
+        reaction.message = await reaction.message.fetch().catch((e) => e);
+    if ((reaction.emoji.name === "🗑️" || reaction.emoji.name === "❌") &&
+        reaction?.message?.author?.id === client?.user?.id &&
+        reaction.message.deletable &&
+        reaction.message.channel.type === (Discord.ChannelType.DM || Discord.ChannelType.GroupDM))
+        await reaction.message.delete();
 });
 client.login(process.env.BOT_TOKEN);
