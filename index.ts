@@ -42,7 +42,7 @@ client.on("ready", (client: Discord.Client) => {
   console.log(`${"-".repeat(42)}\n`);
   console.log(`❯❯❯ ${pc.green("Commands are now available for usage!")}\n`);
   console.log(`❯❯❯ ${pc.green(`Serving ${pc.reset(client.guilds.cache.size)} ${pc.green(`servers`)}`)}\n`);
-  console.log(`❯❯❯ ${pc.green(`Serving ${pc.reset(`${client.users}`)} ${pc.green(`members`)}`)}\n`);
+  console.log(`❯❯❯ ${pc.green(`Serving ${pc.reset(`${client.users.cache.size}`)} ${pc.green(`members`)}`)}\n`);
   console.log(`❯❯❯ ${pc.green(`${pc.reset(client?.user?.tag)} ${pc.green(`is up and running`)}\n`)}`);
   console.log(`❯❯❯ ${pc.green("Boot Time:")} ${ms(Math.round(process.uptime() * 1000))}\n`);
 });
