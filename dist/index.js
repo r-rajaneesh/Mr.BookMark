@@ -48,8 +48,6 @@ rest.put(Routes.applicationCommands("837617682345623572"), { body: [bookmarkCmd.
 client.on("interactionCreate", async (interaction) => {
     // if (!interaction.isCommand()) return;
     if (interaction.isContextMenuCommand() && interaction.commandName === "Bookmark") {
-        if (interaction?.channel?.type !== Discord.ChannelType.GuildText)
-            return;
         await interaction.deferReply({ ephemeral: true });
         const message = await interaction.channel?.messages.fetch(interaction.targetId);
         const attachments = message?.attachments;
