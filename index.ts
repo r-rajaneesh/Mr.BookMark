@@ -10,8 +10,6 @@ server.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-server.listen(80, "0.0.0.0");
-
 const client = new Discord.Client({
   allowedMentions: { parse: [Discord.AllowedMentionsTypes.User], repliedUser: true },
   intents: [
@@ -50,14 +48,23 @@ client.on("ready", (client: Discord.Client) => {
 const bookmarkCmd = new Discord.ContextMenuCommandBuilder().setName("Bookmark").setType(Discord.ApplicationCommandType.Message);
 const rest = new REST().setToken(`${process?.env?.BOT_TOKEN}`);
 rest.put(Routes.applicationCommands("837617682345623572"), { body: [bookmarkCmd.toJSON()] });
-
+Discord.ChannelType.GuildText;
 client.on("interactionCreate", async (interaction) => {
   // if (!interaction.isCommand()) return;
   if (interaction.isContextMenuCommand() && interaction.commandName === "Bookmark") {
-    if (interaction?.channel?.type !== Discord.ChannelType.GuildText) return;
+    if (
+      interaction?.channel?.type ===
+      (Discord.ChannelType.GuildStageVoice ||
+        Discord.ChannelType.DM ||
+        Discord.ChannelType.GroupDM ||
+        Discord.ChannelType.GuildVoice ||
+        Discord.ChannelType.GuildStageVoice)
+    )
+      return;
     await interaction.deferReply({ ephemeral: true });
 
     const message = await interaction.channel?.messages.fetch(interaction.targetId);
+    if (!message) return;
     const attachments = message?.attachments;
     const msg = message?.content;
     const embeds = message?.embeds;
@@ -127,7 +134,9 @@ client.on("interactionCreate", async (interaction) => {
       });
   } else if (interaction.isButton()) {
     if (interaction.customId === "delete") {
-      await interaction.message.delete();
+      await interaction.message.delete().catch((error) => {
+        console.log(error);
+      });
     }
   }
 });
@@ -144,4 +153,28 @@ client.on("messageReactionAdd", async (reaction, user) => {
     await reaction.message.delete();
 });
 
+client.on("warning", async (e) => {
+  console.log(
+    await new Promise(async (res, rej) => {
+      res(e);
+    }),
+  );
+});
+client.on("error", async (e) => {
+  console.log(
+    await new Promise(async (res, rej) => {
+      res(e);
+    }),
+  );
+});
+client.on("debug", async (e) => {
+  // console.log(
+  //   await new Promise(async (res, rej) => {
+  //     res(e);
+  //   }),
+  // );
+});
+
 client.login(process.env.BOT_TOKEN);
+
+server.listen(80, "0.0.0.0");
