@@ -1,6 +1,6 @@
 {
   "name": "mr.bookmark",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "type": "module",
   "main": "dist/index.js",
@@ -10,11 +10,15 @@
     "start": "node dist/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Rajaneesh R",
+    "email": "rajaneeshr@proton.me",
+    "url": "https://r-rajaneesh.vercel.app"
+  },
   "license": "GPL-3",
   "dependencies": {
     "cron": "^2.2.0",
-    "discord.js": "^14.7.1",
+    "discord.js": "^14.8.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "figlet": "^1.5.2",
