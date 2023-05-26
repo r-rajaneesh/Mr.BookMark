@@ -47,7 +47,7 @@ const client = new Discord.Client({
         Discord.Partials.ThreadMember,
         Discord.Partials.User,
     ],
-    presence: { activities: [{ name: "your bookmarked messages", type: Discord.ActivityType.Watching }], status: Discord.PresenceUpdateStatus.Invisible },
+    presence: { activities: [{ name: "your bookmarked messages", type: Discord.ActivityType.Watching }], status: Discord.PresenceUpdateStatus.Idle },
 });
 /* Application Commands */
 const bookmarkCmd = new Discord.ContextMenuCommandBuilder().setName("Bookmark").setType(Discord.ApplicationCommandType.Message);
