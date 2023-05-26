@@ -68,3 +68,6 @@ node_modules/
 build/
 .git/
 package-lock.json
+databases/
+logs/
+old-dist/
