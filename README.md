@@ -1,2 +1,2 @@
 # Mr.BookMark
-Book Marks your message to your Dm's
+Bookmarks your message to your Dm's

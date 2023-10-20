@@ -1,5 +1,5 @@
 import "dotenv/config";
-import Discord, { Routes, REST } from "discord.js";
+import Discord, { REST, Routes } from "discord.js";
 import figlet from "figlet";
 import pc from "picocolors";
 import ms from "ms";
@@ -25,12 +25,12 @@ server.get("/", (req, res) => {
 /* Error logger function */
 function log(data: any) {
   const date = new Date();
+  fs.ensureFileSync(`./logs/${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-").split(" ")[0]}.log`);
   console.log(
-    `${picocolours.bold(`[${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", ":")}] ❯❯❯ [${picocolours.red("ERROR")}]`)} ❯❯❯ ${data}`,
+    `${picocolours.bold(`[${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-")}] ❯❯❯ [${picocolours.red("ERROR")}]`)} ❯❯❯ ${data}`,
   );
-  fs.ensureFileSync(`./logs/${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", ":").split(" ")[0]}.log`);
   fs.writeFileSync(
-    `./logs/${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", ":").split(" ")[0]}.log`,
+    `./logs/${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-").split(" ")[0]}.log`,
     `[${date.toLocaleTimeString().toUpperCase()}] ❯❯❯ [ERROR] ❯❯❯ ${data}`,
   );
 }
@@ -181,7 +181,7 @@ client.on("ready", (client: Discord.Client) => {
 client.on("interactionCreate", async (interaction) => {
   // Channel set command
   if (interaction.isChatInputCommand() && interaction.commandName === "setchannel") {
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
     const channel = interaction.options.getChannel("channel", true, [Discord.ChannelType.GuildAnnouncement, Discord.ChannelType.GuildText]);
     try {
       if (!sql.prepare(`SELECT * FROM guildbookmark WHERE GuildId = (?);`).get(interaction.guildId)) {
@@ -318,7 +318,7 @@ client.on("interactionCreate", async (interaction) => {
         Discord.ChannelType.GuildStageVoice)
     )
       return;
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     const message = await interaction.channel?.messages.fetch(interaction.targetId);
     if (!message) return;
