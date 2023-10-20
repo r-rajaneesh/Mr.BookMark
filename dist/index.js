@@ -11,7 +11,7 @@ const server = express();
 fs.ensureDirSync("./databases");
 fs.ensureDirSync("./logs");
 const sql = new sqlite("./databases/bookmarks.sqlite", { fileMustExist: false });
-const rest = new REST().setToken(`${process?.env?.TEST_BOT_TOKEN}`);
+const rest = new REST().setToken(`${process?.env?.BOT_TOKEN}`);
 /* Prepare database */
 sql.prepare(`CREATE TABLE IF NOT EXISTS dmbookmark (OriginalMessageId TEXT PRIMARY KEY, OriginalMessage TEXT NOT NULL, DirectMessage TEXT);`).run();
 sql.prepare(`CREATE TABLE IF NOT EXISTS channelbookmark (OriginalMessageId TEXT PRIMARY KEY, OriginalMessage TEXT NOT NULL, ChannelMessage TEXT);`).run();
@@ -82,7 +82,7 @@ client.on("ready", (client) => {
         const OriginalMessage = JSON.parse(bookmark.OriginalMessage);
         const DirectMessage = JSON.parse(bookmark.DirectMessage);
         fetch(`https://discord.com/api/v10/channels/${OriginalMessage.channel}/messages/${OriginalMessageId}`, {
-            headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json" },
+            headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json" },
             method: "GET",
         })
             .then(async (res) => {
@@ -120,7 +120,7 @@ client.on("ready", (client) => {
         const OriginalMessage = JSON.parse(bookmark.OriginalMessage);
         const ChannelMessage = JSON.parse(bookmark.ChannelMessage);
         fetch(`https://discord.com/api/v10/channels/${OriginalMessage.channel}/messages/${OriginalMessageId}`, {
-            headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json" },
+            headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json" },
             method: "GET",
         })
             .then(async (res) => {
@@ -130,7 +130,7 @@ client.on("ready", (client) => {
             const GuildChannel = ChannelMessage;
             GuildChannel.forEach(async (ChannelMessage) => {
                 await fetch(`https://discord.com/api/v10/channels/${ChannelMessage.channel}/messages/${ChannelMessage.message}`, {
-                    headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json" },
+                    headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json" },
                     method: "GET",
                 }).then(async (res) => {
                     const msg = await res.json();
@@ -155,7 +155,7 @@ client.on("ready", (client) => {
                         .setTimestamp()
                         .toJSON();
                     await fetch(`https://discord.com/api/v10/channels/${ChannelMessage.channel}/messages/${ChannelMessage.message}`, {
-                        headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json", "Content-Type": "application/json" },
+                        headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json", "Content-Type": "application/json" },
                         method: "PATCH",
                         body: JSON.stringify({ embeds: [dataEmbed, infoEmbed] }),
                     }).catch((error) => log(error));
@@ -584,7 +584,7 @@ client
         const Channels = JSON.parse(ChannelBookmark?.ChannelMessage);
         Channels.forEach(async (ChannelMessage) => {
             fetch(`https://discord.com/api/v10/channels/${ChannelMessage.channel}/messages/${ChannelMessage.message}`, {
-                headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json" },
+                headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json" },
                 method: "GET",
             }).then(async (res) => {
                 const msg = await res.json();
@@ -603,7 +603,7 @@ client
                     .setTimestamp()
                     .toJSON();
                 await fetch(`https://discord.com/api/v10/channels/${ChannelMessage.channel}/messages/${ChannelMessage.message}`, {
-                    headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json", "Content-Type": "application/json" },
+                    headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json", "Content-Type": "application/json" },
                     method: "PATCH",
                     body: JSON.stringify({ embeds: [dataEmbed, infoEmbed] }),
                 }).catch((error) => log(error));
@@ -666,7 +666,7 @@ client
             const Channels = JSON.parse(ChannelBookmark?.ChannelMessage);
             Channels.forEach(async (IChannelMessage) => {
                 fetch(`https://discord.com/api/v10/channels/${IChannelMessage.channel}/messages/${IChannelMessage.message}`, {
-                    headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json" },
+                    headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json" },
                     method: "GET",
                 }).then(async (res) => {
                     const msg = await res.json();
@@ -685,7 +685,7 @@ client
                         .setTimestamp()
                         .toJSON();
                     await fetch(`https://discord.com/api/v10/channels/${IChannelMessage.channel}/messages/${IChannelMessage.message}`, {
-                        headers: { Authorization: `Bot ${process.env.TEST_BOT_TOKEN}`, Accept: "application/json", "Content-Type": "application/json" },
+                        headers: { Authorization: `Bot ${process.env.BOT_TOKEN}`, Accept: "application/json", "Content-Type": "application/json" },
                         method: "PATCH",
                         body: JSON.stringify({ embeds: [dataEmbed, infoEmbed] }),
                     }).catch((error) => log(error));
@@ -713,8 +713,8 @@ client
     //   }),
     // );
 });
-client.login(process.env.TEST_BOT_TOKEN);
-rest.put(Routes.applicationCommands(process.env.TEST_BOT_ID), {
+client.login(process.env.BOT_TOKEN);
+rest.put(Routes.applicationCommands(process.env.BOT_ID), {
     body: [bookmarkCmd.toJSON(), bookmarkChannelCmd.toJSON(), bookmarkChannel.toJSON()],
 });
 server.listen(80, "0.0.0.0");
