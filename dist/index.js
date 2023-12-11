@@ -6,15 +6,16 @@ import ms from "ms";
 import express from "express";
 import sqlite from "better-sqlite3";
 import fs from "fs-extra";
-import picocolours from "picocolors";
 const server = express();
 fs.ensureDirSync("./databases");
 fs.ensureDirSync("./logs");
 const sql = new sqlite("./databases/bookmarks.sqlite", { fileMustExist: false });
 const rest = new REST().setToken(`${process?.env?.BOT_TOKEN}`);
 /* Prepare database */
-sql.prepare(`CREATE TABLE IF NOT EXISTS dmbookmark (OriginalMessageId TEXT PRIMARY KEY, OriginalMessage TEXT NOT NULL, DirectMessage TEXT);`).run();
-sql.prepare(`CREATE TABLE IF NOT EXISTS channelbookmark (OriginalMessageId TEXT PRIMARY KEY, OriginalMessage TEXT NOT NULL, ChannelMessage TEXT);`).run();
+sql.prepare(`CREATE TABLE IF NOT EXISTS dmbookmark (OriginalMessageId TEXT PRIMARY KEY UNIQUE, OriginalMessage TEXT NOT NULL, DirectMessage TEXT);`).run();
+sql
+    .prepare(`CREATE TABLE IF NOT EXISTS channelbookmark (OriginalMessageId TEXT PRIMARY KEY UNIQUE, OriginalMessage TEXT NOT NULL, ChannelMessage TEXT);`)
+    .run();
 sql.prepare(`CREATE TABLE IF NOT EXISTS guildbookmark (GuildId TEXT PRIMARY KEY NOT NULL UNIQUE, ChannelId TEXT NOT NULL UNIQUE);`).run();
 /* Run a web server to ping the bot when running on repl */
 server.get("/", (req, res) => {
@@ -24,7 +25,7 @@ server.get("/", (req, res) => {
 function log(data) {
     const date = new Date();
     fs.ensureFileSync(`./logs/${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-").split(" ")[0]}.log`);
-    console.log(`${picocolours.bold(`[${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-")}] ❯❯❯ [${picocolours.red("ERROR")}]`)} ❯❯❯ ${data}`);
+    console.log(`${pc.bold(`[${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-")}] ❯❯❯ [${pc.red("ERROR")}]`)} ❯❯❯ ${data}`);
     fs.writeFileSync(`./logs/${date.toLocaleString().toUpperCase().replace(",", "").replaceAll("/", "-").split(" ")[0]}.log`, `[${date.toLocaleTimeString().toUpperCase()}] ❯❯❯ [ERROR] ❯❯❯ ${data}`);
 }
 /* Discord Bot Client */
@@ -78,7 +79,7 @@ client.on("ready", (client) => {
     /* Checking for deleted messages when bot went offline or wasn't able to pick up the delete event */
     const DMBookmarks = sql.prepare(`SELECT * FROM dmbookmark;`).all();
     DMBookmarks.forEach((bookmark) => {
-        const OriginalMessageId = JSON.parse(bookmark.OriginalMessageId);
+        const OriginalMessageId = bookmark.OriginalMessageId;
         const OriginalMessage = JSON.parse(bookmark.OriginalMessage);
         const DirectMessage = JSON.parse(bookmark.DirectMessage);
         fetch(`https://discord.com/api/v10/channels/${OriginalMessage.channel}/messages/${OriginalMessageId}`, {
@@ -116,7 +117,7 @@ client.on("ready", (client) => {
     });
     const ChannelBookmarks = sql.prepare(`SELECT * FROM channelbookmark;`).all();
     ChannelBookmarks.forEach((bookmark) => {
-        const OriginalMessageId = JSON.parse(bookmark.OriginalMessageId);
+        const OriginalMessageId = bookmark.OriginalMessageId;
         const OriginalMessage = JSON.parse(bookmark.OriginalMessage);
         const ChannelMessage = JSON.parse(bookmark.ChannelMessage);
         fetch(`https://discord.com/api/v10/channels/${OriginalMessage.channel}/messages/${OriginalMessageId}`, {
